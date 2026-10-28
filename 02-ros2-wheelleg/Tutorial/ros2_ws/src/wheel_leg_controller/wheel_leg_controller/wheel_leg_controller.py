@@ -67,6 +67,18 @@ class WheelLegController(Node):
         self.target_length = float(self.get_parameter('target_length').value)
         self.use_lqr = bool(self.get_parameter('use_lqr').value)
 
+        # ---- 抗扰测试（加分项）：push_t 秒后给两轮一个同向力矩脉冲 ----
+        # 脉冲施加在轮子而非机身，物理上等价于瞬间横向冲量，恢复完全由 LQR 完成。
+        self.declare_parameter('push_t', -1.0)         # 触发时刻 (s)，<0 = 不触发
+        self.declare_parameter('push_torque', 1.0)     # 脉冲力矩 (N·m)
+        self.declare_parameter('push_dur', 0.15)       # 脉冲时长 (s)
+        self.push_t = float(self.get_parameter('push_t').value)
+        self.push_torque = float(self.get_parameter('push_torque').value)
+        self.push_dur = float(self.get_parameter('push_dur').value)
+        self.get_logger().info(
+            f'抗扰设置: push_t={self.push_t}, torque={self.push_torque} N·m, '
+            f'dur={self.push_dur} s')
+
         # ---- 话题 ----
         self.cmd_pub = self.create_publisher(WheelLegCmd, 'actuator_cmd', 10)
         self.create_subscription(JointState, 'joint_states', self.on_joint, 10)
@@ -184,6 +196,12 @@ class WheelLegController(Node):
         cmd.left_phi4 = ctrl_l1
         cmd.right_wheel = right_wheel_T
         cmd.left_wheel = left_wheel_T
+
+        # ---- 抗扰测试：脉冲期间两轮同向加力矩（前向冲量）----
+        if 0.0 <= self.push_t <= self.t < self.push_t + self.push_dur:
+            cmd.left_wheel = float(np.clip(cmd.left_wheel + self.push_torque, -TORQUE_LIMIT, TORQUE_LIMIT))
+            cmd.right_wheel = float(np.clip(cmd.right_wheel - self.push_torque, -TORQUE_LIMIT, TORQUE_LIMIT))
+
         self.cmd_pub.publish(cmd)
 
         if self.steps % 500 == 0:
