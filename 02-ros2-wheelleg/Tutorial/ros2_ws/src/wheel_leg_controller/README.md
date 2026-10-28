@@ -83,9 +83,20 @@ ros2 topic pub --rate 10 /cmd_vel geometry_msgs/msg/Twist "{linear: {x: 0.3}}"
 
 ## 6. 录屏与 bag
 
-- bag（19.15 s，27604 条，`/imu` `/joint_states` `/actuator_cmd` `/cmd_vel`）：
-  `02-ros2-wheelleg/Tutorial/ros2_ws/bags/balance_20s/`（本地生成，未入库）
-- 录屏：待补链接
+bag 文件（19.15 s，27604 条，`/imu` `/joint_states` `/actuator_cmd` `/cmd_vel`）已上传为 Release 资产，不占仓库体积：
+
+- 下载：<https://github.com/roverH77/training/releases/download/ros2-wheelleg-bag/balance_20s_bag.zip>
+- Release 页面：<https://github.com/roverH77/training/releases/tag/ros2-wheelleg-bag>
+
+复现：
+
+```bash
+unzip balance_20s_bag.zip
+ros2 bag info balance_20s_0.db3
+ros2 bag play balance_20s_0.db3
+```
+
+录制条件：headless（`viewer:=false`），站立 3 s → `linear.x=0.3` 持续 8 s → 停止。bag 内 `/imu` 解算出的 pitch：最大 1.88°，中位数 0.17°。
 
 ## 7. 踩过的坑
 
