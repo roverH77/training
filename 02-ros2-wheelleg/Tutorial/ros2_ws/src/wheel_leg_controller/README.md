@@ -152,6 +152,11 @@ ros2 run wheel_leg_controller wheel_leg_controller \
 
 所以"能抗多大扰动"的答案不是一个数字，而是**边界两侧不对称**：边界内轻松恢复（<35°，3.5 s 内），边界外必倒。工程上的做法是把实际外力评估清楚再留 2~3 倍余量，而不是把它当成"参数还能再压一压"。
 
+边界两侧的代表性 bag（`sw_0.16` 恢复 / `sw_0.17` 摔倒）：
+
+- 下载：<https://github.com/roverH77/training/releases/download/ros2-wheelleg-bag/sweep_boundary_bags.zip>
+- 复现：`ros2 run wheel_leg_controller wheel_leg_controller --ros-args -p push_t:=3.0 -p push_torque:=2.0 -p push_dur:=0.16`
+
 ## 8. 踩过的坑
 
 1. **不要和 `wheel_leg_bridge` 同时运行**：同名 `/imu`、`/joint_states` 会造成两帧交错，必然摔倒。
