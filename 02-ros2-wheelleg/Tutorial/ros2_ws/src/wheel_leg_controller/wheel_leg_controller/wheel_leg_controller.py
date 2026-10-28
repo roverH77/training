@@ -28,6 +28,7 @@ from .vmc_cal import five_links_param
 DT = 0.002
 WHEEL_R = 0.06
 TORQUE_LIMIT = 1.5          # 轮子力矩限幅（原版用的就是 1.5，比模型 ±2.0 更保守）
+PUSH_LIMIT = 2.0            # 扰动脉冲限幅，取模型 ctrlrange 上限
 MAX_I = 0.14                # 腿长 PID 输出上限 (N)
 
 # joint_states 顺序：right1, right2, left1, left2, rightwheel, leftwheel
@@ -199,8 +200,8 @@ class WheelLegController(Node):
 
         # ---- 抗扰测试：脉冲期间两轮同向加力矩（前向冲量）----
         if 0.0 <= self.push_t <= self.t < self.push_t + self.push_dur:
-            cmd.left_wheel = float(np.clip(cmd.left_wheel + self.push_torque, -TORQUE_LIMIT, TORQUE_LIMIT))
-            cmd.right_wheel = float(np.clip(cmd.right_wheel - self.push_torque, -TORQUE_LIMIT, TORQUE_LIMIT))
+            cmd.left_wheel = float(np.clip(cmd.left_wheel + self.push_torque, -PUSH_LIMIT, PUSH_LIMIT))
+            cmd.right_wheel = float(np.clip(cmd.right_wheel - self.push_torque, -PUSH_LIMIT, PUSH_LIMIT))
 
         self.cmd_pub.publish(cmd)
 
