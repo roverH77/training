@@ -98,6 +98,11 @@ ros2 bag play balance_20s_0.db3
 
 录制条件：headless（`viewer:=false`），站立 3 s → `linear.x=0.3` 持续 8 s → 停止。bag 内 `/imu` 解算出的 pitch：最大 1.88°，中位数 0.17°。
 
+录屏（站立 3 s → 0.3 m/s 行走 8 s → 停止，1280×800 @25 fps，17 s，MuJoCo 窗口 + 桌面实拍）：
+
+- WebM：<https://github.com/roverH77/training/releases/download/ros2-wheelleg-bag/wheelleg_demo.webm>
+- MP4：<https://github.com/roverH77/training/releases/download/ros2-wheelleg-bag/wheelleg_demo.mp4>
+
 ## 7. 加分项：抗扰动测试
 
 `wheel_leg_sim` 是冻结包，没有外力注入接口，因此扰动从控制器侧注入：在指定时刻给**两轮同向**叠加一个短时力矩脉冲，物理上等价于给车身一个向前冲量，恢复过程完全由 LQR 完成，不修改冻结代码。
